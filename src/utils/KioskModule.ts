@@ -69,6 +69,8 @@ interface KioskModuleInterface {
   // one-time system dialog). No-op in Play builds where the permission is stripped.
   requestIgnoreBatteryOptimizations(): Promise<boolean>;
   isIgnoringBatteryOptimizations(): Promise<boolean>;
+  // Inventory self check-in: hardware identity, each value null when Android withholds it
+  getInventoryIdentity(): Promise<{ androidId: string | null; serial: string | null; macAddress: string | null }>;
 }
 
 const { KioskModule } = NativeModules;

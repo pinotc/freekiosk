@@ -6,7 +6,15 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform, PermissionsAndroid, Alert } from 'react-native';
 import RNFS from 'react-native-fs';
-import { hasSecurePin, getSecureApiKey, saveSecureApiKey, getSecureMqttPassword, saveSecureMqttPassword } from './secureStorage';
+import {
+  hasSecurePin,
+  getSecureApiKey,
+  saveSecureApiKey,
+  getSecureMqttPassword,
+  saveSecureMqttPassword,
+  getSecureInventoryKey,
+  saveSecureInventoryKey,
+} from './secureStorage';
 
 // All storage keys to backup
 const BACKUP_KEYS = [
@@ -125,6 +133,9 @@ const BACKUP_KEYS = [
   '@kiosk_mqtt_status_interval',
   '@kiosk_mqtt_allow_control',
   '@kiosk_mqtt_device_name',
+  // Inventory self check-in (the API key is handled separately via Keychain)
+  '@kiosk_inventory_base_url',
+  '@kiosk_inventory_asset_code',
   '@kiosk_mqtt_motion_always_on',
   '@kiosk_mqtt_screenshot_enabled',
   '@kiosk_mqtt_screenshot_auto',
@@ -312,6 +323,13 @@ export async function buildBackupJson(): Promise<{ success: boolean; json?: stri
       console.warn('Failed to read MQTT password from secure storage:', e);
     }
 
+    try {
+      const inventoryKey = await getSecureInventoryKey();
+      if (inventoryKey) settings['@kiosk_inventory_api_key'] = inventoryKey;
+    } catch (e) {
+      console.warn('Failed to read inventory API key from secure storage:', e);
+    }
+
     const hasPinConfigured = await hasSecurePin();
 
     const backupData: BackupData = {
@@ -456,6 +474,8 @@ export async function importBackup(filePath: string): Promise<{ success: boolean
           } else if (key === '@kiosk_mqtt_password') {
             await saveSecureMqttPassword(value);
             console.log('[BackupService] MQTT password imported to secure storage');
+          } else if (key === '@kiosk_inventory_api_key') {
+            await saveSecureInventoryKey(value);
           } else {
             await AsyncStorage.setItem(key, value);
           }
@@ -510,6 +530,8 @@ export async function importBackupFromContent(jsonContent: string, fileName?: st
           } else if (key === '@kiosk_mqtt_password') {
             await saveSecureMqttPassword(value);
             console.log('[BackupService] MQTT password imported to secure storage');
+          } else if (key === '@kiosk_inventory_api_key') {
+            await saveSecureInventoryKey(value);
           } else {
             await AsyncStorage.setItem(key, value);
           }

@@ -7,6 +7,9 @@ import android.provider.OpenableColumns
 import android.util.Log
 import android.webkit.MimeTypeMap
 import com.facebook.react.bridge.*
+import com.google.mlkit.vision.barcode.BarcodeScanning
+import com.google.mlkit.vision.barcode.common.Barcode
+import com.google.mlkit.vision.common.InputImage
 import java.io.File
 import java.io.FileOutputStream
 
@@ -204,6 +207,37 @@ class FilePickerModule(reactContext: ReactApplicationContext) :
             }
         } catch (e: Exception) {
             promise.reject("DELETE_ERROR", "Failed to delete file: ${e.message}")
+        }
+    }
+
+    /**
+     * Read a QR code (or, failing that, any barcode) from an image file with the bundled
+     * ML Kit model. Resolves the raw text, or null when the image holds no readable code.
+     * Used to fill the inventory asset code from a photo of the tablet's asset sticker.
+     */
+    @ReactMethod
+    fun decodeQrFromImage(filePath: String, promise: Promise) {
+        try {
+            val uri = if (filePath.startsWith("file://") || filePath.startsWith("content://")) {
+                Uri.parse(filePath)
+            } else {
+                Uri.fromFile(File(filePath))
+            }
+            // fromFilePath applies the EXIF rotation, so photos taken sideways still decode
+            val image = InputImage.fromFilePath(reactApplicationContext, uri)
+            val scanner = BarcodeScanning.getClient()
+            scanner.process(image)
+                .addOnSuccessListener { barcodes ->
+                    val withValue = barcodes.filter { !it.rawValue.isNullOrBlank() }
+                    val best = withValue.firstOrNull { it.format == Barcode.FORMAT_QR_CODE } ?: withValue.firstOrNull()
+                    promise.resolve(best?.rawValue)
+                }
+                .addOnFailureListener { e ->
+                    promise.reject("DECODE_ERROR", "Failed to read the image: ${e.message}")
+                }
+                .addOnCompleteListener { scanner.close() }
+        } catch (e: Exception) {
+            promise.reject("DECODE_ERROR", "Failed to open the image: ${e.message}")
         }
     }
 

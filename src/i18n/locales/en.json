@@ -645,7 +645,27 @@
       "removeDeviceOwner": "Remove Device Owner",
       "exitKioskMode": "Exit Kiosk Mode"
     },
-    "versionFooter": "FreeKiosk v{{version}}"
+    "versionFooter": "FreeKiosk v{{version}}",
+    "inventory": {
+      "title": "Inventory check-in",
+      "infoTitle": "Self check-in for inventory audits",
+      "info": "Shows an \"Inventory check-in\" button on the PIN screen. Pressing it reports this tablet to the asset management web app, like scanning its asset QR sticker. It does not require the PIN.",
+      "baseUrl": "Server URL",
+      "baseUrlHint": "Address of the asset management web app, always https://",
+      "apiKey": "API key",
+      "assetCode": "Asset code",
+      "assetCodeHint": "Code printed on this tablet's asset QR sticker",
+      "scanQr": "Scan with camera",
+      "test": "Test connection",
+      "testing": "Testing…",
+      "testOk": "Connection OK",
+      "testFailed": "Connection failed",
+      "uploadQrImage": "Upload QR image",
+      "imageReading": "Reading image…",
+      "imageErrorTitle": "Could not read the QR code",
+      "imageNoQr": "No QR code found in this image. Use a sharper photo where the QR code is large and fully visible.",
+      "imageOpenFailed": "Could not open the selected image."
+    }
   },
   "dashboard": {
     "iconModes": {
@@ -1454,6 +1474,24 @@
       "downloadStalledMessage": "The update has not downloaded anything for 90 seconds, so it was stopped. Check the network connection and try again.",
       "installFailedTitle": "Update not installed",
       "installFailedMessage": "The update was downloaded but Android refused to install it: {{message}}"
+    },
+    "pin": {
+      "inventoryCheckIn": "Inventory check-in",
+      "inventoryCheckingIn": "Checking in…",
+      "deviceInfo": {
+        "title": "Device information",
+        "code": "Tablet code",
+        "name": "Tablet name",
+        "assignee": "Assigned user",
+        "location": "Location of use",
+        "notAssigned": "Not allocated",
+        "noLocation": "No location",
+        "loading": "Loading device information…",
+        "refreshing": "Updating…",
+        "updatedAt": "Updated {{time}}",
+        "stale": "Could not update: {{error}} Showing data from {{time}}.",
+        "unavailable": "Device information unavailable."
+      }
     }
   }
 }

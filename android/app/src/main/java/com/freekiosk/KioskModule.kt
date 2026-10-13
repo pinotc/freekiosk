@@ -2040,6 +2040,42 @@ class KioskModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaM
         promise.resolve(map)
     }
 
+    /**
+     * Hardware identity reported with an inventory self check-in. Each value is null when
+     * Android won't give it to us: since Android 10 the serial needs Device Owner plus
+     * READ_PHONE_STATE, and the real Wi-Fi MAC needs Device Owner (apps otherwise see a
+     * randomized one). ANDROID_ID is scoped to the app signing key on Android 8+, so it
+     * changes if the APK is re-signed with a different key.
+     */
+    @ReactMethod
+    fun getInventoryIdentity(promise: Promise) {
+        val map = Arguments.createMap()
+        val androidId = try {
+            android.provider.Settings.Secure.getString(
+                reactApplicationContext.contentResolver,
+                android.provider.Settings.Secure.ANDROID_ID
+            )
+        } catch (e: Exception) { null }
+        map.putString("androidId", androidId)
+
+        val serial = try {
+            @Suppress("DEPRECATION")
+            val raw = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) Build.getSerial() else Build.SERIAL
+            raw?.takeIf { it.isNotBlank() && !it.equals("unknown", ignoreCase = true) }
+        } catch (e: Exception) { null }
+        map.putString("serial", serial)
+
+        val mac = try {
+            val dpm = reactApplicationContext.getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
+            if (dpm.isDeviceOwnerApp(reactApplicationContext.packageName)) {
+                dpm.getWifiMacAddress(ComponentName(reactApplicationContext, DeviceAdminReceiver::class.java))
+            } else null
+        } catch (e: Exception) { null }
+        map.putString("macAddress", mac)
+
+        promise.resolve(map)
+    }
+
     private fun getIpAddress(): String {
         try {
             val interfaces = NetworkInterface.getNetworkInterfaces()

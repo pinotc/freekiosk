@@ -40,6 +40,8 @@ interface FilePickerModuleType {
   pickJsonFile(): Promise<PickedJsonFile>;
   /** Open "Save As" dialog for JSON export. Uses SAF to bypass Scoped Storage on Android 10+. */
   saveJsonFile(content: string, filename: string): Promise<SavedJsonFile>;
+  /** Read a QR code (or any barcode) from an image file. Resolves null if none is found. */
+  decodeQrFromImage(filePath: string): Promise<string | null>;
   /** Delete a previously copied media file */
   deleteMediaFile(filePath: string): Promise<boolean>;
   /** Get the internal media directory path */

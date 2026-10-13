@@ -5,3 +5,5 @@ org.gradle.configureondemand=true
 android.useAndroidX=true
 android.enableJetifier=true
 newArchEnabled=false
+# Bundle the ML Kit barcode model so QR scanning works without Google Play Services
+VisionCamera_enableCodeScanner=true

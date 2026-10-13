@@ -9,7 +9,7 @@ import {
 } from '../types/dashboard';
 import { ManagedApp } from '../types/managedApps';
 import { MediaItem, MediaFitMode } from '../types/mediaPlayer';
-import { saveSecureApiKey, getSecureApiKey, clearSecureApiKey, clearSecureMqttPassword } from './secureStorage';
+import { saveSecureApiKey, getSecureApiKey, clearSecureApiKey, clearSecureMqttPassword, clearSecureInventoryKey } from './secureStorage';
 
 export const KEYS = {
   URL: '@kiosk_url',
@@ -170,6 +170,10 @@ export const KEYS = {
   MQTT_STATUS_INTERVAL: '@kiosk_mqtt_status_interval',
   MQTT_ALLOW_CONTROL: '@kiosk_mqtt_allow_control',
   MQTT_DEVICE_NAME: '@kiosk_mqtt_device_name',
+  // Inventory self check-in (API key lives in Keychain)
+  INVENTORY_BASE_URL: '@kiosk_inventory_base_url',
+  INVENTORY_ASSET_CODE: '@kiosk_inventory_asset_code',
+  INVENTORY_DEVICE_INFO: '@kiosk_inventory_device_info', // cached device-info answer
   MQTT_MOTION_ALWAYS_ON: '@kiosk_mqtt_motion_always_on',
   // MQTT image publishing (screenshot / camera snapshots)
   MQTT_SCREENSHOT_ENABLED: '@kiosk_mqtt_screenshot_enabled',
@@ -644,6 +648,10 @@ export const StorageService = {
         KEYS.MQTT_ALLOW_CONTROL,
         KEYS.MQTT_DEVICE_NAME,
         KEYS.MQTT_MOTION_ALWAYS_ON,
+        // Inventory self check-in
+        KEYS.INVENTORY_BASE_URL,
+        KEYS.INVENTORY_ASSET_CODE,
+        KEYS.INVENTORY_DEVICE_INFO,
         // MQTT image publishing
         KEYS.MQTT_SCREENSHOT_ENABLED,
         KEYS.MQTT_SCREENSHOT_AUTO,
@@ -680,6 +688,7 @@ export const StorageService = {
       // Also clear secure API key and MQTT password from Keychain
       await clearSecureApiKey();
       await clearSecureMqttPassword();
+      await clearSecureInventoryKey();
     } catch (error) {
       console.error('Error clearing all storage keys:', error);
     }

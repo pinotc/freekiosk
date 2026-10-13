@@ -181,6 +181,8 @@ export type IconName =
   | 'file-document-outline'
   // Network & MQTT
   | 'lan-connect'
+  | 'clipboard-check-outline'
+  | 'barcode'
   | 'lan-disconnect'
   | 'home-search'
   | 'timer-outline'

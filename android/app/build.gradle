@@ -229,6 +229,10 @@ dependencies {
     // HiveMQ MQTT Client for Home Assistant integration
     implementation("com.hivemq:hivemq-mqtt-client:1.3.12")
 
+    // ML Kit barcode scanning with the bundled model: reads the asset QR from an uploaded
+    // image. Same artifact VisionCamera bundles with VisionCamera_enableCodeScanner=true.
+    implementation("com.google.mlkit:barcode-scanning:17.3.0")
+
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")
     } else {

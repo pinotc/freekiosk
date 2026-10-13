@@ -14,6 +14,7 @@ import {
 } from '../../../components/settings';
 import { ApiSettingsSection } from '../../../components/ApiSettingsSection';
 import { MqttSettingsSection } from '../../../components/MqttSettingsSection';
+import { InventorySettingsSection } from '../../../components/InventorySettingsSection';
 import { CertificateInfo } from '../../../utils/CertificateModule';
 import AccessibilityModule from '../../../utils/AccessibilityModule';
 import { CloudSyncService } from '../../../utils/CloudSyncService';
@@ -432,6 +433,9 @@ const AdvancedTab: React.FC<AdvancedTabProps> = ({
         </SettingsSection>
       )}
       
+      {/* Inventory self check-in */}
+      <InventorySettingsSection />
+
       {/* REST API - Home Assistant Integration */}
       <ApiSettingsSection />
 

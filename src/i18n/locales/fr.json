@@ -645,7 +645,27 @@
       "removeDeviceOwner": "Retirer le Device Owner",
       "exitKioskMode": "Quitter le mode kiosque"
     },
-    "versionFooter": "FreeKiosk v{{version}}"
+    "versionFooter": "FreeKiosk v{{version}}",
+    "inventory": {
+      "title": "Pointage inventaire",
+      "infoTitle": "Auto-pointage pour les inventaires",
+      "info": "Affiche un bouton « Pointage inventaire » sur l'écran du code PIN. Il signale cette tablette à l'application web de gestion des équipements, comme le scan de son étiquette QR. Le code PIN n'est pas requis.",
+      "baseUrl": "URL du serveur",
+      "baseUrlHint": "Adresse de l'application web de gestion des équipements, toujours en https://",
+      "apiKey": "Clé API",
+      "assetCode": "Code de l'équipement",
+      "assetCodeHint": "Code imprimé sur l'étiquette QR de cette tablette",
+      "scanQr": "Scanner avec la caméra",
+      "test": "Tester la connexion",
+      "testing": "Test en cours…",
+      "testOk": "Connexion réussie",
+      "testFailed": "Échec de la connexion",
+      "uploadQrImage": "Importer une image QR",
+      "imageReading": "Lecture de l'image…",
+      "imageErrorTitle": "Lecture du QR code impossible",
+      "imageNoQr": "Aucun QR code trouvé dans cette image. Utilisez une photo plus nette où le QR code est grand et entièrement visible.",
+      "imageOpenFailed": "Impossible d'ouvrir l'image sélectionnée."
+    }
   },
   "dashboard": {
     "iconModes": {
@@ -1454,6 +1474,24 @@
       "downloadStalledMessage": "La mise à jour n'a rien téléchargé pendant 90 secondes, elle a donc été arrêtée. Vérifiez la connexion réseau et réessayez.",
       "installFailedTitle": "Mise à jour non installée",
       "installFailedMessage": "La mise à jour a été téléchargée, mais Android a refusé de l'installer : {{message}}"
+    },
+    "pin": {
+      "inventoryCheckIn": "Pointage inventaire",
+      "inventoryCheckingIn": "Pointage en cours…",
+      "deviceInfo": {
+        "title": "Informations de l'appareil",
+        "code": "Code tablette",
+        "name": "Nom de la tablette",
+        "assignee": "Utilisateur",
+        "location": "Emplacement",
+        "notAssigned": "Non attribuée",
+        "noLocation": "Aucun emplacement",
+        "loading": "Chargement des informations…",
+        "refreshing": "Mise à jour…",
+        "updatedAt": "Mis à jour le {{time}}",
+        "stale": "Mise à jour impossible : {{error}} Données du {{time}}.",
+        "unavailable": "Informations indisponibles."
+      }
     }
   }
 }

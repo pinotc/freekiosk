@@ -12,6 +12,7 @@ const MQTT_PASSWORD_SERVICE = 'freekiosk_mqtt_password';
 const WIFI_PASSWORD_SERVICE_PREFIX = 'freekiosk_wifi_password:';
 const BASIC_AUTH_PASSWORD_SERVICE = 'freekiosk_basic_auth_password';
 const CLOUD_CREDENTIALS_SERVICE = 'freekiosk_cloud';
+const INVENTORY_KEY_SERVICE = 'freekiosk_inventory_key';
 const LEGACY_API_KEY = '@kiosk_rest_api_key'; // Legacy AsyncStorage key for migration
 const ATTEMPTS_KEY = '@kiosk_pin_attempts';
 const LOCKOUT_KEY = '@kiosk_pin_lockout';
@@ -842,6 +843,45 @@ export async function clearSecureMqttPassword(): Promise<void> {
     console.log('[SecureStorage] MQTT password cleared');
   } catch (error) {
     console.error('[SecureStorage] Error clearing MQTT password:', error);
+  }
+}
+
+// ============================================
+// INVENTORY CHECK-IN API KEY
+// ============================================
+
+export async function saveSecureInventoryKey(key: string): Promise<boolean> {
+  try {
+    if (!key || key.trim() === '') {
+      await clearSecureInventoryKey();
+      return true;
+    }
+    await Keychain.setGenericPassword('inventory_key', key.trim(), {
+      service: INVENTORY_KEY_SERVICE,
+      accessible: Keychain.ACCESSIBLE.WHEN_UNLOCKED,
+    });
+    return true;
+  } catch (error) {
+    console.error('[SecureStorage] Error saving inventory key:', error);
+    return false;
+  }
+}
+
+export async function getSecureInventoryKey(): Promise<string> {
+  try {
+    const credentials = await Keychain.getGenericPassword({ service: INVENTORY_KEY_SERVICE });
+    return credentials && credentials.password ? credentials.password : '';
+  } catch (error) {
+    console.error('[SecureStorage] Error getting inventory key:', error);
+    return '';
+  }
+}
+
+export async function clearSecureInventoryKey(): Promise<void> {
+  try {
+    await Keychain.resetGenericPassword({ service: INVENTORY_KEY_SERVICE });
+  } catch (error) {
+    console.error('[SecureStorage] Error clearing inventory key:', error);
   }
 }
 

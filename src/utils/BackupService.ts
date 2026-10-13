@@ -445,7 +445,23 @@ export async function readBackupFile(filePath: string): Promise<{ success: boole
 /**
  * Import configuration from a backup file
  */
-export async function importBackup(filePath: string): Promise<{ success: boolean; error?: string; warning?: string }> {
+const INVENTORY_ASSET_CODE_KEY = '@kiosk_inventory_asset_code';
+
+export interface ImportOptions {
+  /**
+   * Leave this tablet's inventory asset code untouched. The code identifies one physical
+   * tablet, so a backup used to set up another tablet must not carry it over.
+   */
+  skipInventoryAssetCode?: boolean;
+}
+
+/** The inventory asset code stored in a backup (the tablet it was exported from), if any. */
+export function getBackupInventoryAssetCode(data: BackupData | null | undefined): string | null {
+  const value = data?.settings?.[INVENTORY_ASSET_CODE_KEY];
+  return typeof value === 'string' && value.trim() ? value.trim() : null;
+}
+
+export async function importBackup(filePath: string, options?: ImportOptions): Promise<{ success: boolean; error?: string; warning?: string }> {
   try {
     // Read and validate backup
     const result = await readBackupFile(filePath);
@@ -466,6 +482,9 @@ export async function importBackup(filePath: string): Promise<{ success: boolean
     for (const key of keys) {
       try {
         const value = backupData.settings[key];
+        if (options?.skipInventoryAssetCode && key === INVENTORY_ASSET_CODE_KEY) {
+          continue;
+        }
         if (value !== null && value !== undefined) {
           // Handle API key separately - save to secure storage (Keychain)
           if (key === '@kiosk_rest_api_key') {
@@ -496,7 +515,7 @@ export async function importBackup(filePath: string): Promise<{ success: boolean
  * Import configuration from raw JSON content (from SAF file picker).
  * This bypasses Scoped Storage restrictions by working with the content directly.
  */
-export async function importBackupFromContent(jsonContent: string, fileName?: string): Promise<{ success: boolean; error?: string; warning?: string }> {
+export async function importBackupFromContent(jsonContent: string, fileName?: string, options?: ImportOptions): Promise<{ success: boolean; error?: string; warning?: string }> {
   try {
     // Parse and validate
     let data: BackupData;
@@ -523,6 +542,9 @@ export async function importBackupFromContent(jsonContent: string, fileName?: st
     for (const key of keys) {
       try {
         const value = data.settings[key];
+        if (options?.skipInventoryAssetCode && key === INVENTORY_ASSET_CODE_KEY) {
+          continue;
+        }
         if (value !== null && value !== undefined) {
           if (key === '@kiosk_rest_api_key') {
             await saveSecureApiKey(value);

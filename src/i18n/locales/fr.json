@@ -777,7 +777,10 @@
       "browsedFile": "Fichier parcouru",
       "unknown": "Inconnu",
       "previewError": "Impossible de lire les détails de la sauvegarde",
-      "restoreThisBackup": "Restaurer cette sauvegarde"
+      "restoreThisBackup": "Restaurer cette sauvegarde",
+      "inventoryCodeQuestion": "Ce fichier contient aussi le code d'équipement {{code}} de la tablette d'origine. Conservez-le uniquement pour restaurer cette même tablette. Pour configurer une autre tablette, ignorez-le puis scannez l'étiquette QR de cette tablette (Avancé → Pointage inventaire). L'URL du serveur et la clé API sont importées dans tous les cas.",
+      "inventoryCodeSkip": "Ignorer le code",
+      "inventoryCodeKeep": "Garder {{code}}"
     },
     "mqtt": {
       "timeoutError": "Délai de connexion dépassé après 15 secondes. Vérifiez l'URL du broker, le port et la connectivité réseau.",

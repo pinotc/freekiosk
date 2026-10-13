@@ -777,7 +777,10 @@
       "browsedFile": "Browsed file",
       "unknown": "Unknown",
       "previewError": "Unable to read backup details",
-      "restoreThisBackup": "Restore This Backup"
+      "restoreThisBackup": "Restore This Backup",
+      "inventoryCodeQuestion": "This file also contains the inventory asset code {{code}} of the tablet it was exported from. Keep it only when restoring that same tablet. When setting up another tablet, skip it and then scan this tablet's QR sticker (Advanced → Inventory check-in). The server URL and API key are imported either way.",
+      "inventoryCodeSkip": "Skip asset code",
+      "inventoryCodeKeep": "Keep {{code}}"
     },
     "mqtt": {
       "timeoutError": "Connection timed out after 15 seconds. Check broker URL, port, and network connectivity.",

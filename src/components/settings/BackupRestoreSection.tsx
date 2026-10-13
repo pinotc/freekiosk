@@ -25,7 +25,9 @@ import {
   listBackupFiles,
   deleteBackupFile,
   readBackupFile,
+  getBackupInventoryAssetCode,
   BackupData,
+  ImportOptions,
 } from '../../utils/BackupService';
 import FilePickerModule from '../../utils/FilePickerModule';
 import { useTranslation } from 'react-i18next';
@@ -143,98 +145,119 @@ const BackupRestoreSection: React.FC<BackupRestoreSectionProps> = ({
   const handleRestoreBrowsedBackup = async () => {
     if (!browsedContent) return;
 
-    Alert.alert(
-      t('components.backupRestore.restoreConfigTitle'),
+    confirmRestore(
       t('components.backupRestore.restoreFromNamedMessage', { name: browsedFileName }),
-      [
-        { text: t('components.backupRestore.cancel'), style: 'cancel' },
-        {
-          text: t('components.backupRestore.restore'),
-          style: 'destructive',
-          onPress: async () => {
-            setIsRestoring(true);
-            try {
-              const result = await importBackupFromContent(browsedContent, browsedFileName || undefined);
-              if (result.success) {
-                let message = t('components.backupRestore.restoreSuccessBase');
-                if (result.warning) {
-                  message += `\n\n${result.warning}`;
-                }
-                message += t('components.backupRestore.restartNote');
-
-                Alert.alert(t('components.backupRestore.restoreCompleteTitle'), message, [
-                  {
-                    text: t('components.backupRestore.ok'),
-                    onPress: () => {
-                      setShowRestoreModal(false);
-                      setSelectedBackup(null);
-                      setBackupPreview(null);
-                      setBrowsedContent(null);
-                      setBrowsedFileName(null);
-                      onRestoreComplete?.();
-                    },
-                  },
-                ]);
-              } else {
-                Alert.alert(
-                  t('components.backupRestore.restoreFailedTitle'),
-                  result.error || t('components.backupRestore.unknownError'),
-                  [{ text: t('components.backupRestore.ok') }]
-                );
-              }
-            } finally {
-              setIsRestoring(false);
+      async (options) => {
+        setIsRestoring(true);
+        try {
+          const result = await importBackupFromContent(browsedContent, browsedFileName || undefined, options);
+          if (result.success) {
+            let message = t('components.backupRestore.restoreSuccessBase');
+            if (result.warning) {
+              message += `\n\n${result.warning}`;
             }
-          },
-        },
-      ]
+            message += t('components.backupRestore.restartNote');
+
+            Alert.alert(t('components.backupRestore.restoreCompleteTitle'), message, [
+              {
+                text: t('components.backupRestore.ok'),
+                onPress: () => {
+                  setShowRestoreModal(false);
+                  setSelectedBackup(null);
+                  setBackupPreview(null);
+                  setBrowsedContent(null);
+                  setBrowsedFileName(null);
+                  onRestoreComplete?.();
+                },
+              },
+            ]);
+          } else {
+            Alert.alert(
+              t('components.backupRestore.restoreFailedTitle'),
+              result.error || t('components.backupRestore.unknownError'),
+              [{ text: t('components.backupRestore.ok') }]
+            );
+          }
+        } finally {
+          setIsRestoring(false);
+        }
+      }
     );
   };
 
   const handleRestoreBackup = async () => {
     if (!selectedBackup) return;
 
+    confirmRestore(
+      t('components.backupRestore.restoreGenericMessage'),
+      async (options) => {
+        setIsRestoring(true);
+        try {
+          const result = await importBackup(selectedBackup.path, options);
+          if (result.success) {
+            let message = t('components.backupRestore.restoreSuccessBase');
+            if (result.warning) {
+              message += `\n\n${result.warning}`;
+            }
+            message += t('components.backupRestore.restartNote');
+
+            Alert.alert(t('components.backupRestore.restoreCompleteTitle'), message, [
+              {
+                text: t('components.backupRestore.ok'),
+                onPress: () => {
+                  setShowRestoreModal(false);
+                  setSelectedBackup(null);
+                  setBackupPreview(null);
+                  onRestoreComplete?.();
+                },
+              },
+            ]);
+          } else {
+            Alert.alert(
+              t('components.backupRestore.restoreFailedTitle'),
+              result.error || t('components.backupRestore.unknownError'),
+              [{ text: t('components.backupRestore.ok') }]
+            );
+          }
+        } finally {
+          setIsRestoring(false);
+        }
+      }
+    );
+  };
+
+  /**
+   * Confirm a restore. When the backup carries an inventory asset code (the tablet it was
+   * exported from), ask whether to keep it: keep it to restore that same tablet, skip it to
+   * set up another tablet from the same file, whose own sticker is then scanned.
+   */
+  const confirmRestore = (message: string, onConfirm: (options: ImportOptions) => void) => {
+    const assetCode = getBackupInventoryAssetCode(backupPreview);
+    if (!assetCode) {
+      Alert.alert(
+        t('components.backupRestore.restoreConfigTitle'),
+        message,
+        [
+          { text: t('components.backupRestore.cancel'), style: 'cancel' },
+          { text: t('components.backupRestore.restore'), style: 'destructive', onPress: () => onConfirm({}) },
+        ]
+      );
+      return;
+    }
     Alert.alert(
       t('components.backupRestore.restoreConfigTitle'),
-      t('components.backupRestore.restoreGenericMessage'),
+      `${message}
+
+${t('components.backupRestore.inventoryCodeQuestion', { code: assetCode })}`,
       [
         { text: t('components.backupRestore.cancel'), style: 'cancel' },
         {
-          text: t('components.backupRestore.restore'),
-          style: 'destructive',
-          onPress: async () => {
-            setIsRestoring(true);
-            try {
-              const result = await importBackup(selectedBackup.path);
-              if (result.success) {
-                let message = t('components.backupRestore.restoreSuccessBase');
-                if (result.warning) {
-                  message += `\n\n${result.warning}`;
-                }
-                message += t('components.backupRestore.restartNote');
-
-                Alert.alert(t('components.backupRestore.restoreCompleteTitle'), message, [
-                  {
-                    text: t('components.backupRestore.ok'),
-                    onPress: () => {
-                      setShowRestoreModal(false);
-                      setSelectedBackup(null);
-                      setBackupPreview(null);
-                      onRestoreComplete?.();
-                    },
-                  },
-                ]);
-              } else {
-                Alert.alert(
-                  t('components.backupRestore.restoreFailedTitle'),
-                  result.error || t('components.backupRestore.unknownError'),
-                  [{ text: t('components.backupRestore.ok') }]
-                );
-              }
-            } finally {
-              setIsRestoring(false);
-            }
-          },
+          text: t('components.backupRestore.inventoryCodeSkip'),
+          onPress: () => onConfirm({ skipInventoryAssetCode: true }),
+        },
+        {
+          text: t('components.backupRestore.inventoryCodeKeep', { code: assetCode }),
+          onPress: () => onConfirm({}),
         },
       ]
     );
